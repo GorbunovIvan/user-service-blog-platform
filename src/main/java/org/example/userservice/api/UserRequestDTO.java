@@ -17,6 +17,13 @@ public class UserRequestDTO implements UserMainFields {
     private LocalDate birthDate;
     private String phoneNumber;
 
+    public UserRequestDTO(User user) {
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+        this.birthDate = user.getBirthDate();
+        this.phoneNumber = user.getPhoneNumber();
+    }
+
     public User toUser() {
         return new User(
                 null,
