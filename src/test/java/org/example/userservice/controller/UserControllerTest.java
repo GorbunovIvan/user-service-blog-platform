@@ -3,11 +3,15 @@ package org.example.userservice.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.restassured.RestAssured;
+import jakarta.annotation.PostConstruct;
 import org.example.userservice.api.UserRequestDTO;
 import org.example.userservice.model.User;
 import org.example.userservice.model.UserMainFields;
+import org.example.userservice.model.security.Role;
 import org.example.userservice.service.UserService;
+import org.example.userservice.service.security.jwt.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -28,8 +32,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -43,11 +46,23 @@ class UserControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+    private final JavaTimeModule javaTimeModule = new JavaTimeModule();
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+    private String token;
 
     private List<User> usersInDB = new ArrayList<>();
 
+    @PostConstruct
+    private void init() {
+        this.token = jwtTokenProvider.createToken("test", Role.ADMIN.getPermissions());
+    }
+
     @BeforeEach
     void setUp() {
+
+        objectMapper.registerModule(javaTimeModule);
 
         RestAssured.baseURI = "http://localhost/api/v1/users";
         RestAssured.port = port;
@@ -67,10 +82,23 @@ class UserControllerTest {
     }
 
     @Test
+    void testJWTAuthorization_NoToken() {
+
+        when()
+            .get()
+        .then()
+            .statusCode(HttpStatus.FORBIDDEN.value());
+
+        verify(userService, never()).getAll();
+    }
+
+    @Test
     void testGetAll() throws JsonProcessingException {
 
         var jsonResponse =
-                when()
+                given()
+                    .header("Authorization", token)
+                .when()
                     .get()
                 .then()
                     .statusCode(200)
@@ -89,7 +117,9 @@ class UserControllerTest {
         for (var user : usersInDB) {
 
             var jsonResponse =
-                    when()
+                    given()
+                        .header("Authorization", token)
+                    .when()
                         .get("/{id}", user.getId())
                     .then()
                         .statusCode(200)
@@ -110,7 +140,9 @@ class UserControllerTest {
 
         var id = 0L;
 
-        when()
+        given()
+            .header("Authorization", token)
+        .when()
             .get("/{id}", id)
         .then()
             .statusCode(404);
@@ -124,7 +156,9 @@ class UserControllerTest {
         for (var user : usersInDB) {
 
             var jsonResponse =
-                    when()
+                    given()
+                        .header("Authorization", token)
+                    .when()
                         .get("/username/{username}", user.getUsername())
                     .then()
                         .statusCode(200)
@@ -145,7 +179,9 @@ class UserControllerTest {
 
         var username = "-";
 
-        when()
+        given()
+            .header("Authorization", token)
+        .when()
             .get("/username/{username}", username)
         .then()
             .statusCode(404);
@@ -160,6 +196,7 @@ class UserControllerTest {
 
         var jsonResponse =
                 given()
+                    .header("Authorization", token)
                     .contentType("application/json")
                     .body(objectMapper.writeValueAsString(newUser))
                 .when()
@@ -186,6 +223,7 @@ class UserControllerTest {
             var newUser = new UserRequestDTO(user.getUsername(), "new_password", LocalDate.now(), "+99999999");
 
             given()
+                .header("Authorization", token)
                 .contentType("application/json")
                 .body(objectMapper.writeValueAsString(newUser))
             .when()
@@ -210,6 +248,7 @@ class UserControllerTest {
 
             var jsonResponse
                     = given()
+                        .header("Authorization", token)
                         .contentType("application/json")
                         .body(objectMapper.writeValueAsString(userToUpdate))
                     .when()
@@ -234,6 +273,7 @@ class UserControllerTest {
         var userToUpdate = new UserRequestDTO();
 
         given()
+            .header("Authorization", token)
             .contentType("application/json")
             .body(objectMapper.writeValueAsString(userToUpdate))
         .when()
@@ -251,7 +291,9 @@ class UserControllerTest {
 
         for (var user : usersInDB) {
 
-            when()
+            given()
+                .header("Authorization", token)
+            .when()
                 .delete("/{id}", user.getId())
            .then()
                 .statusCode(200)

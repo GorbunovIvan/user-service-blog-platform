@@ -6,3 +6,13 @@ spring:
     password:
   jpa:
     show-sql: true
+
+security:
+  jwt:
+    requestHeader: authorization
+    secretKey: testSecretKey-testSecretKey-testSecretKey
+    validity: 36
+  default-users:
+    admin:
+      username: test
+      password: test

@@ -12,3 +12,13 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+security:
+  jwt:
+    requestHeader: authorization
+    secretKey: mySecretKey-mySecretKey-mySecretKey
+    validity: 3600
+  default-users:
+    admin:
+      username: admin
+      password: admin
