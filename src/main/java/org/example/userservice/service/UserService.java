@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -56,10 +57,18 @@ public class UserService {
     @Transactional
     public User update(Long id, @Nonnull UserMainFields user) {
 
-        if (!userRepository.existsById(id)) {
+        var userById = getById(id);
+        if (userById == null) {
             var errorMessage = "User with id '" + id + "' does not exist";
             log.error(errorMessage);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
+        }
+
+        var userByUsername = getByUsername(user.getUsername());
+        if (userByUsername != null && !userByUsername.getId().equals(id)) {
+            var errorMessage = "User with username '" + id + "' already exists";
+            log.warn(errorMessage);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
         }
 
         var userEntity = getUserEntityOutOfDTO(user);
@@ -67,6 +76,10 @@ public class UserService {
             var errorMessage = "Unknown type of user - " + user;
             log.error(errorMessage);
             throw new RuntimeException(errorMessage);
+        }
+
+        if (Optional.ofNullable(userEntity.getPassword()).orElse("").isBlank()) {
+            userEntity.setPassword(userById.getPassword());
         }
 
         userEntity.setId(id);

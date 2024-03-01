@@ -26,6 +26,19 @@ public class AuthenticationController {
     private final UserDetailsService userDetailsService;
     private final AuthenticationManager authenticationManager;
 
+    @PostMapping("/check-token")
+    public ResponseEntity<Boolean> checkToken(@RequestBody String token) {
+        if (token == null) {
+            return ResponseEntity.ok(false);
+        }
+        try {
+            boolean result = jwtTokenProvider.validateToken(token);
+            return ResponseEntity.ok(result);
+        } catch (Exception ignored) {
+        }
+        return ResponseEntity.ok(false);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserDetailsDto userDetailsDto) {
 

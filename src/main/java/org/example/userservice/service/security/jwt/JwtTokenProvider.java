@@ -1,12 +1,14 @@
 package org.example.userservice.service.security.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +25,7 @@ import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class JwtTokenProvider {
 
     @Value("${security.jwt.requestHeader}")
@@ -63,6 +66,9 @@ public class JwtTokenProvider {
         try {
             var claims = getClaims(token);
             return claims.getExpiration().after(new Date());
+        } catch (ExpiredJwtException e) {
+            log.info("Token expired");
+            throw new RuntimeException(HttpStatus.UNAUTHORIZED + ". " + e.getMessage());
         } catch (JwtException | AuthenticationException | IllegalArgumentException e) {
             throw new RuntimeException(HttpStatus.UNAUTHORIZED + ". " + e.getMessage());
         }
