@@ -2,7 +2,7 @@ FROM openjdk
 
 WORKDIR /app
 
-COPY target/user-service-blog-platform-0.0.1-SNAPSHOT.jar ./app.jar
+COPY build/libs/user-service-blog-platform-0.0.1-SNAPSHOT.jar ./app.jar
 
 EXPOSE 8083
 

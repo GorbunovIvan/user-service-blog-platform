@@ -5,7 +5,8 @@ spring:
   application:
     name: user-service
   datasource:
-    url: jdbc:mysql://localhost:3306/user-service-blog-platform
+#    url: jdbc:mysql://localhost:3306/user-service-blog-platform
+    url: jdbc:mysql://mysql-db:3306/user-service-blog-platform # for docker
     username: root
     password: root
   jpa:
