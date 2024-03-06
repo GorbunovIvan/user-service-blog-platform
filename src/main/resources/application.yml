@@ -1,33 +1,6 @@
-server:
-  port: 8083
-
 spring:
   application:
     name: user-service
-  datasource:
-#    url: jdbc:mysql://localhost:3306/user-service-blog-platform
-    url: jdbc:mysql://mysql-db:3306/user-service-blog-platform # for docker
-    username: root
-    password: root
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-
-eureka:
-  instance:
-    instance-id: ${spring.application.name}:${random.uuid}
-  client:
-    service-url:
-#      defaultZone: http://localhost:8761/eureka
-      defaultZone: http://eureka-server:8761/eureka # for docker
-
-security:
-  jwt:
-    requestHeader: authorization
-    secretKey: mySecretKey-mySecretKey-mySecretKey
-    validity: 3600 # in seconds
-  default-users:
-    admin:
-      username: admin
-      password: admin
+  config:
+#    import: configserver:http://localhost:8888
+    import: configserver:http://config-server:8888 # for docker
