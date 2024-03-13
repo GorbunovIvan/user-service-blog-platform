@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.restassured.RestAssured;
 import jakarta.annotation.PostConstruct;
+import org.example.userservice.BaseIntegrationTest;
 import org.example.userservice.api.UserRequestDTO;
 import org.example.userservice.model.User;
 import org.example.userservice.model.UserMainFields;
@@ -36,7 +37,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-class UserControllerTest {
+class UserControllerTest extends BaseIntegrationTest {
 
     @LocalServerPort
     private int port;

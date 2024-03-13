@@ -1,5 +1,6 @@
 package org.example.userservice.service;
 
+import org.example.userservice.BaseIntegrationTest;
 import org.example.userservice.api.UserRequestDTO;
 import org.example.userservice.model.User;
 import org.example.userservice.model.UserMainFields;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @Transactional
-class UserServiceTest {
+class UserServiceTest extends BaseIntegrationTest {
 
     @Autowired
     private UserService userService;

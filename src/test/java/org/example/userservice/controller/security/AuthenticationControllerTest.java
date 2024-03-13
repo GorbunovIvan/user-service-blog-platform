@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
+import org.example.userservice.BaseIntegrationTest;
 import org.example.userservice.api.security.UserDetailsDto;
 import org.example.userservice.model.security.Role;
 import org.example.userservice.model.security.UserDetailsImpl;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-class AuthenticationControllerTest {
+class AuthenticationControllerTest extends BaseIntegrationTest {
 
     @LocalServerPort
     private int port;

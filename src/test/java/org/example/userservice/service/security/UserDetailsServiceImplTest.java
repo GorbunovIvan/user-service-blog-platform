@@ -1,5 +1,6 @@
 package org.example.userservice.service.security;
 
+import org.example.userservice.BaseIntegrationTest;
 import org.example.userservice.model.security.Role;
 import org.example.userservice.model.security.UserDetailsImpl;
 import org.example.userservice.repository.security.UserDetailsRepository;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @Transactional
-class UserDetailsServiceImplTest {
+class UserDetailsServiceImplTest extends BaseIntegrationTest {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
