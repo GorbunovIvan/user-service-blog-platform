@@ -1,0 +1,89 @@
+# Mysql Deployment
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: blog-platform-mysql-deployment
+  labels:
+    app: blog-platform-mysql
+spec:
+  replicas: 1 #2
+  selector:
+    matchLabels:
+      project: blog-platform-mysql
+  template:
+    metadata:
+      labels:
+        project: blog-platform-mysql
+    spec:
+      containers:
+        - name : mysql
+          image: mysql:latest
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "root"
+            - name: MYSQL_DATABASE
+              value: "user-service-blog-platform"
+
+---
+# Mysql Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-db
+  labels:
+     env  : dev
+     owner: IvanGorbunov
+spec:
+  selector:
+    project: blog-platform-mysql
+  ports:
+    - name      : mysql-listener
+      protocol  : TCP
+      port      : 3306
+      targetPort: 3306
+  #type: CLusterIP
+
+---
+# User-service Deployment
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: blog-platform-users-deployment
+  labels:
+    app: blog-platform-users
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      project: blog-platform-users
+  template:
+    metadata:
+      labels:
+        project: blog-platform-users
+    spec:
+      containers:
+        - name: user-service
+          image: ivangorbunovv/blog-platform-spring-cloud:user-service-blog-platform-image
+          ports:
+            - containerPort: 8083
+
+---
+# User-service Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  labels:
+     env  : dev
+     owner: IvanGorbunov
+spec:
+  selector:
+    project: blog-platform-users
+  ports:
+    - name      : user-service-listener
+      protocol  : TCP
+      port      : 8083
+      targetPort: 8083
+  #type: CLusterIP

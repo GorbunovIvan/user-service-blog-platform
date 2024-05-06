@@ -9,4 +9,4 @@ EXPOSE 8083
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
 # Run:
-#   'docker build -t user-service-blog-platform-image .'
+#   'docker build -t ivangorbunovv/user-service-blog-platform-image .'
